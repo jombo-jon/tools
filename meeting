@@ -1,0 +1,59 @@
+#!/bin/bash
+# Create a dated text file at a specific location .
+#
+
+set -e
+
+readonly MEETING_DIRECTORY="${NOTES_DIRECTORY:-"${HOME}/notes/meetings"}"
+readonly MEETING_EDITOR="vim"
+
+readonly NOTES_PATH="${NOTES_DIRECTORY}/$(date +%Y)/$(date +%B)"
+
+if [ ${#} -eq 0 ]; then
+	# Ask for project 
+	read -rp "Specify Project : " PR
+	read PROJECT <<< $(echo "${PR}" | tr '[:upper:]' '[:lower:]')
+	echo $PROJECT
+	readonly MEETING_PROJECT="${MEETING_DIRECTORY}/${PROJECT}" 
+	
+	# Project Folder
+	if [ ! -d "${MEETING_PROJECT}" ];then
+		mkdir -p "${MEETING_PROJECT}"
+	fi
+
+
+else
+	read PROJECT <<< $(echo "${*}" | tr '[:upper:]' '[:lower:]')
+	readonly MEETING_PROJECT="${MEETING_DIRECTORY}/${PROJECT}" 
+	
+	# Project Folder
+	if [ ! -d "${MEETING_PROJECT}" ];then
+		read -rp "${PROJECT} does not exist, do you want to create it? (y/n) " yn
+		case "${yn}" in
+			[Yy]* ) mkdir -p "${MEETING_PROJECT}";; 
+			[Nn]* ) exit;;
+			* ) exit;;
+		esac
+	fi
+fi
+
+
+# Meeting File in Project  Folder
+readonly MEETING_FILEPATH="${MEETING_PROJECT}/$(date +%Y-%m-%d).txt"
+if [ ! -f "${MEETING_FILEPATH}" ];then
+	touch "${MEETING_FILEPATH}"
+	echo "Project : ${PROJECT}" >> "${MEETING_FILEPATH}"
+	printf "Date : %s, " "$(date +%A)" >> "${MEETING_FILEPATH}"
+	printf "%s " "$(date +%d)" >> "${MEETING_FILEPATH}"
+	printf "%s " "$(date +%B)" >> "${MEETING_FILEPATH}"
+	printf "%s \n" "$(date +%Y)" >> "${MEETING_FILEPATH}"
+	echo "Time : $(date +%H:%M)" >> "${MEETING_FILEPATH}"
+	echo "----------------------------">> "${MEETING_FILEPATH}"
+	echo "Participants:">> "${MEETING_FILEPATH}"
+	echo "ROSAS - Jonathan Hendriks - hej">> "${MEETING_FILEPATH}"
+	echo "">> "${MEETING_FILEPATH}"
+	echo "----------------------------">> "${MEETING_FILEPATH}"
+	echo "">> "${MEETING_FILEPATH}"
+fi
+
+eval "${MEETING_EDITOR}" "${MEETING_FILEPATH}"
