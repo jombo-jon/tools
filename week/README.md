@@ -13,7 +13,7 @@ alias numweek='rweek --number $1 | xargs nvim'
 ```
 
 The commands are the following :
-*`week` Opens/creates the current week file from Monday to Sunday
-*`nweek` Opens the next week file
-*`nweek` Opens the previous week file
-*`nunweek arg` Opens the arg number week file
+* `week` Opens/creates the current week file from Monday to Sunday
+* `nweek` Opens the next week file
+* `nweek` Opens the previous week file
+* `nunweek arg` Opens the arg number week file
