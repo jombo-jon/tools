@@ -1,0 +1,13 @@
+[package]
+name = "task"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[general]
+dirs = ["templates"]
+
+[dependencies]
+argparse = "0.2.2"
+chrono = "0.4"
+askama = "0.10.5"
