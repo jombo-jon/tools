@@ -8,6 +8,7 @@ use argparse::{ArgumentParser, StoreTrue};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
+use std::process;
 
 use askama::Template; // bring trait in scope
 
@@ -31,11 +32,14 @@ struct WeeklyTemplate<'a>{
    sun: &'a str,
 }
 
-fn main() {
+fn main(){
     let pattern : Vec<String> = env::args().collect();
     // println!("Task Manager");
     // println!("{:?}",pattern);
    
+    let path = Path::new("/mnt/c/000/Calendar");
+    let today = chrono::Utc::today();
+    
     let mut week = false;
     let mut calendar =false; 
     let mut todo = false; 
@@ -60,16 +64,20 @@ fn main() {
     // println!("{:?}, {:?}",d,w);
 
     if calendar {
+        let yfd = format!("{}{}",d.year(),".md");
 
+        let fd = path.join(yfd);
+        let display = path.display();
+        
+        println!("{:?}",fd);
+        process::exit(1);
     }
 
     if todo {
 
     }
     
-    // if week {
-        let path = Path::new("/mnt/c/000/Calendar");
-        let today = chrono::Utc::today();
+    if week {
         let yfd = format!("{}",d.year());
         let wfd = format!("{}{}{}","W",today.iso_week().week(),".md");
 
@@ -116,8 +124,8 @@ fn main() {
         } 
         //open with Nvim
         println!("{:?}",fd);
-        return 0; 
-    // }
+        process::exit(1);
+    }
         
 
 }
