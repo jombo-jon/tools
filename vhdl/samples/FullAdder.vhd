@@ -5,12 +5,14 @@ use IEEE.std_logic_unsigned.all;
 
 --  Defines a design entity, without any ports.
 entity fulladder is
-    Port (
-            A, B : in std_logic;
-            Cin : in std_logic;
-            Y : out std_logic;
-            Cout : out std_logic
-         );
+  Port (
+    A, B : in std_logic;
+    Cin : in std_logic;
+    voila_o          : out std_logic_vector(MAX downto 0);
+    
+    Y : out std_logic;
+    Cout : out std_logic
+);
 end fulladder;
 
 architecture behaviour of fulladder is

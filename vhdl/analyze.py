@@ -55,6 +55,11 @@ def main() -> int:
         lines = x.group().split('\n')
 
         # Firs line
+        namepattern1
+        namepattern3
+        namepattern2
+        namepattern5
+        namepattern3
 
         namepattern = 'entity (.*?) is'
         name = re.findall(namepattern, lines[0])
