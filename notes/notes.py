@@ -61,6 +61,26 @@ date: {{ date }}
             fd.write(data)
     return filepath
 
+def QandA(path,project=''):
+    filename = 'QA_' + date.today().strftime('%Y-%m-%d') + '.md'
+    filepath = os.path.join(path,filename)
+    if not os.path.exists(filepath):
+        txt = """
+---
+title: QA_{{ date }}_{{ prj }}
+project: {{ prj }}
+author: {{ user }}
+date: {{ date }}
+...
+
+"""
+        tm = Template(txt)
+        data = tm.render(prj=project,user=os.environ['USER'],date=date.today().strftime('%Y-%m-%d'))
+        os.makedirs(os.path.join(os.path.dirname(filepath)),exist_ok=True)
+        with open(filepath,'w') as fd:
+            fd.write(data)
+    return filepath
+            
 def todo(filepath,project=''):
     if not os.path.exists(filepath):
         txt = """
@@ -79,6 +99,7 @@ ________________________________________________________________
         os.makedirs(os.path.join(os.path.dirname(filepath)),exist_ok=True)
         with open(filepath,'w') as fd:
             fd.write(data)
+    return filepath
 
 
 def main() -> int:
@@ -88,7 +109,9 @@ def main() -> int:
     args = parser.parse_args()
     
     if args.t == True: 
-        TodoPath = "/home/hej/perso/stowfiles/notes/.notes/test.txt"
+        # TodoPath = "/home/hej/perso/stowfiles/notes/.notes/test.txt"
+        TodoPath = os.path.join(os.environ["HOMENOTES"], "todo.md")
+
         todo(TodoPath)
         subprocess.run(["nvim",'+','-c "norm 0"','-c "startinsert"', TodoPath])
         # vim.command('FloatermNew nvim /home/hej/perso/stowfiles/notes/test.txt')
@@ -96,27 +119,30 @@ def main() -> int:
         # vim.command('echo "hello world"')
     else :
         # TEST
-        os.environ['HOME_PROJECT'] = '/home/hej/perso/stowfiles/notes/testprojet'
-        os.environ['HOME_NOTES'] = '/home/hej/perso/stowfiles/notes/.notes'
+        # os.environ['HOMENOTES'] = '/home/hej/perso/stowfiles/notes/testprojet'
+        # os.environ['HOMENOTES'] = '/home/hej/perso/stowfiles/notes/.notes'
         # ----
-        # print(os.environ['HOME_PROJECT'])
-        # print(os.environ['HOME_NOTES'])
+        # print(os.environ['HOMENOTES'])
+        # print(os.environ['HOMENOTES'])
 
         # Selection Project, fuzzy finder pop up
-        projects = os.listdir(os.environ['HOME_PROJECT'])
+        # projects = os.listdir(os.environ['HOMENOTES'])
+        lprojects = [d for d in os.listdir(os.environ['HOMENOTES']) if os.path.isdir(os.path.join(os.environ['HOMENOTES'],d))]
+        projects = [d for d in lprojects if ".obsidian" not in d]
+        
         fzf = FzfPrompt()
         project = fzf.prompt(projects,'--height=40% --layout=reverse --info=inline --border --margin=1 --padding=1 --header-first --header=\'Project Selection:\'')
         project = project[0]
 
         # Selection Notebook, Todo or Meeting
-        l = ['Notebook', 'Meeting', 'Todo']
+        l = ['Notebook','Q&A', 'Meeting', 'Todo']
         choice = fzf.prompt(l,'--height=40% --layout=reverse --info=inline --border --margin=1 --padding=1 --header-first --header=\'Document Selection:\'')
         choice = choice[0]
 
         if choice == 'Notebook':
 
             ## Notebook N or list
-            NotebookPath = os.path.join(os.environ['HOME_NOTES'],project,'notebook')
+            NotebookPath = os.path.join(os.environ['HOMENOTES'],project,'notebook')
             notebooks = ['New']
             try:
                 notebooks.extend([f for f in os.listdir(NotebookPath) if os.path.isfile(os.path.join(NotebookPath, f))])
@@ -135,7 +161,7 @@ def main() -> int:
 
         elif choice == 'Meeting': 
             ## Meeting N or list (saved by date)
-            MeetingPath = os.path.join(os.environ['HOME_NOTES'],project,'meeting')
+            MeetingPath = os.path.join(os.environ['HOMENOTES'],project,'meeting')
             meetings = ['New']
             try:
                 meetings.extend([f for f in os.listdir(MeetingPath) if os.path.isfile(os.path.join(MeetingPath, f))])
@@ -154,9 +180,29 @@ def main() -> int:
             ## NVIM the file
             subprocess.run(["nvim",'+','-c "norm 0"','-c "startinsert"', filepath])
 
+        elif choice == 'Q&A': 
+            ## QA N or list (saved by date)
+            QAPath = os.path.join(os.environ['HOMENOTES'],project,'QA')
+            qa = ['New']
+            try:
+                qa.extend([f for f in os.listdir(QAPath) if os.path.isfile(os.path.join(QAPath, f))])
+            except FileNotFoundError:
+                os.makedirs(QAPath)
+            except :
+                raise ValueError('A very specific bad thing happened.')
+
+            file = fzf.prompt(qa,'--height=40% --layout=reverse --info=inline --border --margin=1 --padding=1 --header-first --header=\'Q&A Selection:\'')
+            filename = file[0] 
+            if filename == 'New':
+                filepath = QandA(QAPath,project)
+            else:
+                filepath = os.path.join(QAPath,filename)
+
+            ## NVIM the file
+            subprocess.run(["nvim",'+','-c "norm 0"','-c "startinsert"', filepath])
         elif choice == 'Todo':
             ## Todo for the project
-            TodoPath = os.path.join(os.environ['HOME_NOTES'],project,'todo.txt')
+            TodoPath = os.path.join(os.environ['HOMENOTES'],project,'todo.txt')
             todo(TodoPath,project)
             subprocess.run(["nvim",'+','-c "norm 0"','-c "startinsert"', TodoPath])
             ## NVIM the file
