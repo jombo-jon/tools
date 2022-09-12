@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+vhdl
 """ ****************************************************************************
  * @file        analyze.py
  * @project     Personal
@@ -21,6 +22,9 @@ from jinja2 import Template
 import pyperclip
 
 import re
+
+def test(a,b):
+    return a+b
 
 def main() -> int:
     """Echo the input arguments to standard output"""
@@ -55,12 +59,6 @@ def main() -> int:
         lines = x.group().split('\n')
 
         # Firs line
-        namepattern1
-        namepattern3
-        namepattern2
-        namepattern5
-        namepattern3
-
         namepattern = 'entity (.*?) is'
         name = re.findall(namepattern, lines[0])
         name = name[0]
